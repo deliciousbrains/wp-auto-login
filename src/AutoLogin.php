@@ -13,6 +13,8 @@ class AutoLogin {
 	private static $instance;
 
 	/**
+	 * Expiration time interval.
+	 *
 	 * @var int
 	 */
 	protected $expires;
@@ -21,14 +23,13 @@ class AutoLogin {
 	 * @return AutoLogin Instance
 	 */
 	public static function instance() {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
+		if ( ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
 			self::$instance->init();
 		}
 
 		return self::$instance;
 	}
-
 
 	public function init() {
 		$this->expires = DAY_IN_SECONDS * 30 * 4;
