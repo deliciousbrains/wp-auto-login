@@ -14,7 +14,7 @@ class AutoLogin {
 
 	/**
 	 * Expiration time interval.
-   *
+	 *
 	 * @var int
 	 */
 	protected $expires;
