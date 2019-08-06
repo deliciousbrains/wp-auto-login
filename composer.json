@@ -1,0 +1,22 @@
+{
+  "name": "deliciousbrains/wp-auto-login",
+  "description": "WordPress library for generating automatic login URLs for users",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Delicious Brains",
+      "email": "nom@deliciousbrains.com",
+      "homepage": "https://deliciousbrains.com/"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "DeliciousBrains\\WPAutoLogin\\": "src/"
+    }
+  },
+  "require": {
+    "deliciousbrains/wp-migrations": "^2.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
