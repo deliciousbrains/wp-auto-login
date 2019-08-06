@@ -7,6 +7,13 @@ use DeliciousBrains\WPMigrations\Database\Migrator;
 
 class AutoLogin {
 
+	/**
+	 * Expiration time interval.
+	 *
+	 * @var int
+	 */
+	private $expires = 0;
+
 	function __construct() {
 		$this->expires = DAY_IN_SECONDS * 30 * 4;
 	}
