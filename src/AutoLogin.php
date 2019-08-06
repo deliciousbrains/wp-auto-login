@@ -7,11 +7,31 @@ use DeliciousBrains\WPMigrations\Database\Migrator;
 
 class AutoLogin {
 
-	function __construct() {
-		$this->expires = DAY_IN_SECONDS * 30 * 4;
+	/**
+	 * @var AutoLogin
+	 */
+	private static $instance;
+
+	/**
+	 * @var int
+	 */
+	protected $expires;
+
+	/**
+	 * @return AutoLogin Instance
+	 */
+	public static function instance() {
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
+			self::$instance = new AutoLogin();
+			self::$instance->init();
+		}
+
+		return self::$instance;
 	}
 
+
 	public function init() {
+		$this->expires = DAY_IN_SECONDS * 30 * 4;
 		Migrator::instance();
 		add_filter( 'dbi_wp_migrations_paths', array( $this, 'add_migration_path' ) );
 		add_action( 'init', array( $this, 'handle_auto_login' ), 10 );
@@ -135,4 +155,22 @@ class AutoLogin {
 		return add_query_arg( $args, $url );
 	}
 
+	/**
+	 * Protected constructor to prevent creating a new instance of the
+	 * class via the `new` operator from outside of this class.
+	 */
+	protected function __construct() {
+	}
+
+	/**
+	 * As this class is a singleton it should not be clone-able
+	 */
+	protected function __clone() {
+	}
+
+	/**
+	 * As this class is a singleton it should not be able to be unserialized
+	 */
+	protected function __wakeup() {
+	}
 }
