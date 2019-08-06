@@ -23,7 +23,7 @@ class AutoLogin {
 	 * @return AutoLogin Instance
 	 */
 	public static function instance() {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
+		if ( ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
 			self::$instance->init();
 		}
