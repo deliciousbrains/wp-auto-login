@@ -12,7 +12,10 @@
   "autoload": {
     "psr-4": {
       "DeliciousBrains\\WPAutoLogin\\": "src/"
-    }
+    },
+    "files": [
+      "functions.php"
+    ]
   },
   "require": {
     "deliciousbrains/wp-migrations": "^2.0"
