@@ -3,6 +3,7 @@
 namespace DeliciousBrains\WPAutoLogin;
 
 use DeliciousBrains\WPAutoLogin\Model\AutoLoginKey;
+use DeliciousBrains\WPAutoLogin\CLI\Command;
 use DeliciousBrains\WPMigrations\Database\Migrator;
 
 class AutoLogin {
@@ -18,21 +19,31 @@ class AutoLogin {
 	protected $expires;
 
 	/**
+	 * @param string $command_name
+	 *
 	 * @return AutoLogin Instance
 	 */
-	public static function instance() {
+	public static function instance( $command_name =  'dbi') {
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
-			self::$instance->init();
+			self::$instance->init( $command_name );
 		}
 
 		return self::$instance;
 	}
 
 
-	public function init() {
+	/**
+	 * @param $command_name
+	 */
+	public function init( $command_name ) {
 		$this->expires = DAY_IN_SECONDS * 30 * 4;
 		Migrator::instance();
+
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			\WP_CLI::add_command( $command_name . ' auto-login-url', Command::class );
+		}
+
 		add_filter( 'dbi_wp_migrations_paths', array( $this, 'add_migration_path' ) );
 		add_action( 'init', array( $this, 'handle_auto_login' ), 10 );
 	}
@@ -144,7 +155,7 @@ class AutoLogin {
 	 *
 	 * @return string
 	 */
-	public function create_url( $url, $user_id, $args, $expires_in = null ) {
+	public function create_url( $url, $user_id, $args = array(), $expires_in = null ) {
 		$login_key = $this->create_key( $user_id, $expires_in );
 
 		$args = array_merge( $args, array(
