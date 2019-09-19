@@ -158,10 +158,10 @@ class AutoLogin {
 	public function create_url( $url, $user_id, $args = array(), $expires_in = null ) {
 		$login_key = $this->create_key( $user_id, $expires_in );
 
-		$args = array_merge( $args, array(
+		$args = array_merge( array(
 			'login_key' => $login_key,
 			'user_id'   => $user_id,
-		) );
+		), $args );
 
 		return add_query_arg( $args, $url );
 	}
