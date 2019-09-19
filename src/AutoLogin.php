@@ -45,7 +45,7 @@ class AutoLogin {
 		}
 
 		add_filter( 'dbi_wp_migrations_paths', array( $this, 'add_migration_path' ) );
-		add_action( 'init', array( $this, 'handle_auto_login' ), 10 );
+		add_action( 'init', array( $this, 'handle_auto_login' ) );
 	}
 
 	public function add_migration_path( $paths ) {
