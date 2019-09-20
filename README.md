@@ -1,4 +1,4 @@
-# Delicious Brains WordPress Migrations
+# Delicious Brains Automatic Logins
 
 WordPress library for generating automatic login URLs for users
 
