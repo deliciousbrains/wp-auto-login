@@ -144,7 +144,7 @@ class AutoLogin {
 		AutoLoginKey::where( 'created', '<', $expired_date )->where( 'expires', '0000-00-00 00:00:00' )->delete();
 
 		$now_date = gmdate( 'Y-m-d H:i:s', time() );
-		AutoLoginKey::where( 'expires', '<', $now_date )->delete();
+		AutoLoginKey::where( 'expires', '<', $now_date )->where( 'expires', '!=', '0000-00-00 00:00:00' )->delete();
 	}
 
 	/**
