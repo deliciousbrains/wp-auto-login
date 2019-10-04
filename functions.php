@@ -1,7 +1,7 @@
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+	return;
 }
 
 if ( ! function_exists( 'dbi_get_auto_login_url' ) ) {
