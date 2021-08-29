@@ -19,7 +19,5 @@
   },
   "require": {
     "deliciousbrains/wp-migrations": "^2.0"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }
