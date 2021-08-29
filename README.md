@@ -19,8 +19,8 @@ It requires the [deliciousbrains/wp-migration](https://github.com/deliciousbrain
 
 To generate a URL that will automatically login a user and land them at a specific URL use this function:
 
-`dbi_get_auto_login_url( $destination_url, $user_id', $query_parms );`
+`dbi_get_auto_login_url( $destination_url, $user_id, $query_parms );`
 
 The URL will expire in 120 days. However, you can pass the number of seconds the URL will be valid for as the fourth argument, e.g valid for 1 day:
 
-`dbi_get_auto_login_url( $destination_url, $user_id', $query_parms, 86400 );`
+`dbi_get_auto_login_url( $destination_url, $user_id, $query_parms, 86400 );`
