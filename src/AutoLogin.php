@@ -6,14 +6,21 @@ use DeliciousBrains\WPAutoLogin\Model\AutoLoginKey;
 use DeliciousBrains\WPAutoLogin\CLI\Command;
 use DeliciousBrains\WPMigrations\Database\Migrator;
 
+/**
+ * Main auto-login functionality
+ */
 class AutoLogin {
 
 	/**
+	 * Singleton instance
+	 *
 	 * @var AutoLogin
 	 */
 	private static $instance;
 
 	/**
+	 * Key expiry duration in seconds
+	 *
 	 * @var int
 	 */
 	protected $expires;
@@ -55,12 +62,24 @@ class AutoLogin {
 		add_action( 'init', array( $this, 'handle_auto_login' ) );
 	}
 
+	/**
+	 * Filter to modify paths for migration files for the wp-migrations package
+	 *
+	 * @param string[] $paths  List of paths passed in.
+	 *
+	 * @return string[]
+	 */
 	public function add_migration_path( $paths ) {
 		$paths[] = dirname( __DIR__ ) . '/migrations';
 
 		return $paths;
 	}
 
+	/**
+	 * Action to (possibly) handle login on init hook
+	 *
+	 * @return void
+	 */
 	public function handle_auto_login() {
 		$login_key = filter_input( INPUT_GET, 'login_key', FILTER_SANITIZE_STRING );
 		$user_id   = filter_input( INPUT_GET, 'user_id', FILTER_VALIDATE_INT );
