@@ -19,14 +19,17 @@ class AutoLogin {
 	protected $expires;
 
 	/**
-	 * @param string $command_name
+	 * Instantiate singleton instance
+	 *
+	 * @param string $command_name  Name to used for WP-CLI command.
+	 * @param int    $expires       Key expiry in seconds - default 4 months.
 	 *
 	 * @return AutoLogin Instance
 	 */
-	public static function instance( $command_name =  'dbi') {
+	public static function instance( $command_name = 'dbi', $expires = 10_368_000 ) {
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
-			self::$instance->init( $command_name );
+			self::$instance->init( $command_name, $expires );
 		}
 
 		return self::$instance;
@@ -34,15 +37,19 @@ class AutoLogin {
 
 
 	/**
-	 * @param $command_name
+	 * Initialise the singleton instance
+	 *
+	 * @param string $command_name  Name to used for WP-CLI command.
+	 * @param int    $expires       Key expiry in seconds.
 	 */
-	public function init( $command_name ) {
-		$this->expires = DAY_IN_SECONDS * 30 * 4;
+	public function init( $command_name, $expires ) {
 		Migrator::instance();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( $command_name . ' auto-login-url', Command::class );
 		}
+
+		$this->expires = $expires;
 
 		add_filter( 'dbi_wp_migrations_paths', array( $this, 'add_migration_path' ) );
 		add_action( 'init', array( $this, 'handle_auto_login' ) );
