@@ -116,22 +116,22 @@ class AutoLogin {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string $key_to_find
 	 *
 	 * @return bool|int
 	 */
-	public function get_user_id_for_key( $key ) {
-		$row = AutoLoginKey::get_by_key( $key );
+	public function get_user_id_for_key( $key_to_find ) {
+		$key = AutoLoginKey::get_by_key( $key_to_find );
 
-		if ( ! $row ) {
+		if ( ! $key ) {
 			return false;
 		}
 
-		if ( mysql2date( 'G', $row->created ) < time() - $this->expires ) {
+		if ( $key->is_expired() ) {
 			return false;
 		}
 
-		return $row->user_id;
+		return $key->user_id;
 	}
 
 	/**
@@ -148,12 +148,13 @@ class AutoLogin {
 			$already_exists = AutoLoginKey::get_by_key( $key );
 		} while ( $already_exists );
 
-
 		$loginkey            = new AutoLoginKey();
 		$loginkey->login_key = $key;
 		$loginkey->user_id   = $user_id;
 		if ( $expires_in ) {
 			$loginkey->expires = gmdate( 'Y-m-d H:i:s', time() + $expires_in );
+		} else {
+			$loginkey->expires = gmdate( 'Y-m-d H:i:s', time() + $this->expires );
 		}
 
 		$result = $loginkey->save();

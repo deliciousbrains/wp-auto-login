@@ -11,16 +11,58 @@ class AutoLoginKey {
 	 */
 	protected static $table = 'dbrns_auto_login_keys';
 
+	/**
+	 * The key
+	 *
+	 * @var string
+	 */
 	public $login_key;
+
+	/**
+	 * User ID that the key is for
+	 *
+	 * @var int
+	 */
 	public $user_id;
+
+	/**
+	 * Key created date/time in MySQL format (UTC/GMT)
+	 *
+	 * @var string
+	 */
+	public $created;
+
+	/**
+	 * Key expiry date/time in MySQL format (UTC/GMT)
+	 *
+	 * @var string
+	 */
 	public $expires;
+
+	public function __construct( $attributes = array() ) {
+		foreach ( $attributes as $key => $value ) {
+			$this->$key = $value;
+		}
+		if ( ! isset( $attributes['created'] ) ) {
+			$this->created = gmdate( 'Y-m-d H:i:s', time() );
+		}
+	}
 
 	public static function get_by_key( $key ) {
 		global $wpdb;
 
 		$table = self::$table;
 
-		return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->prefix{$table} WHERE login_key = %s ORDER BY CREATED DESC LIMIT 1", $key ) );
+		$row = $wpdb->get_row(
+			$wpdb->prepare( "SELECT * FROM $wpdb->prefix{$table} WHERE login_key = %s ORDER BY CREATED DESC LIMIT 1", $key ),
+			ARRAY_A
+		);
+
+		if ( empty( $row ) ) {
+			return null;
+		}
+
+		return new self( $row );
 	}
 
 	public static function delete_created( $date ) {
@@ -42,14 +84,34 @@ class AutoLoginKey {
 	public function save() {
 		global $wpdb;
 
-		$data = array( 'login_key' => $this->login_key, 'user_id' => $this->user_id );
-
-		if ( $this->expires ) {
-			$data['expires'] = $this->expires;
-		}
-
-		$data['created'] = gmdate( 'Y-m-d H:i:s', time() );
+		$data = array(
+			'login_key' => $this->login_key,
+			'user_id'   => $this->user_id,
+			'expires'   => $this->expires,
+			'created'   => $this->created,
+		);
 
 		return $wpdb->insert( $wpdb->prefix . self::$table, $data );
+	}
+
+	public function is_expired() {
+		// Handle legacy key for backwards compatibility.
+		if ( $this->is_legacy_key() && $this->has_legacy_key_expired() ) {
+			return false;
+		}
+
+		// TODO: MAKE THIS WORK WITH NEW OBJECTS AND DATA
+		if ( mysql2date( 'G', $key->created ) < time() - $this->expires ) {
+			return false;
+		}
+	}
+
+	public function is_legacy_key() {
+		return '0000-00-00 00:00:00' === $this->expires;
+	}
+
+	public function has_legacy_key_expired() {
+		// The old version always used 4 months expiry.
+		return ( strtotime( $this->created ) + DAY_IN_SECONDS * 30 * 4 ) < time();
 	}
 }
