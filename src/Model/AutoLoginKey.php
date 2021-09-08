@@ -12,6 +12,11 @@ class AutoLoginKey {
 	protected static $table = 'dbrns_auto_login_keys';
 
 	/**
+	 * Constant for number of seconds legacy keys expire after - was 4 months(ish).
+	 */
+	const LEGACY_EXPIRY_SECONDS = 4 * 30 * DAY_IN_SECONDS;
+
+	/**
 	 * The key
 	 *
 	 * @var string
@@ -65,20 +70,36 @@ class AutoLoginKey {
 		return new self( $row );
 	}
 
-	public static function delete_created( $date ) {
+	/**
+	 * Static method to delete legacy keys from the database.
+	 * These keys will have an expiry of '0000-00-00 00:00:00', and will need to be
+	 * expired based on their creation date.
+	 *
+	 * @return void
+	 */
+	public static function delete_legacy_keys() {
 		global $wpdb;
 
 		$table = self::$table;
 
-		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE created < %s AND expires = '0000-00-00 00:00:00'", $date ) );
+		$expired_keys_created_before_time = gmdate( 'Y-m-d H:i:s', time() - self::LEGACY_EXPIRY_SECONDS );
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE created < %s AND expires = '0000-00-00 00:00:00'", $expired_keys_created_before_time ) );
 	}
 
-	public static function delete_expires( $date ) {
+	/**
+	 * Static method to delete expired keys from the database.
+	 *
+	 * @return void
+	 */
+	public static function delete_expired_keys() {
 		global $wpdb;
 
 		$table = self::$table;
 
-		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE expires < %s AND expires != '0000-00-00 00:00:00'", $date ) );
+		$sql_now = gmdate( 'Y-m-d H:i:s', time() );
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE expires < %s AND expires != '0000-00-00 00:00:00'", $sql_now ) );
 	}
 
 	public function save() {
@@ -114,6 +135,6 @@ class AutoLoginKey {
 
 	public function has_legacy_key_expired() {
 		// The old version always used 4 months expiry.
-		return ( strtotime( $this->created ) + DAY_IN_SECONDS * 30 * 4 ) < time();
+		return ( strtotime( $this->created ) + self::LEGACY_EXPIRY_SECONDS ) < time();
 	}
 }

@@ -141,8 +141,6 @@ class AutoLogin {
 	 * @return bool|string
 	 */
 	public function create_key( $user_id, $expires_in = null ) {
-		$this->remove_expired_keys();
-
 		do {
 			$key            = wp_generate_password( 40, false );
 			$already_exists = AutoLoginKey::get_by_key( $key );
@@ -166,12 +164,14 @@ class AutoLogin {
 		return $key;
 	}
 
+	/**
+	 * Purge expired keys from the database.
+	 *
+	 * @return void
+	 */
 	protected function remove_expired_keys() {
-		$expired_date = gmdate( 'Y-m-d H:i:s', ( time() - $this->expires ) );
-		AutoLoginKey::delete_created( $expired_date );
-
-		$now_date = gmdate( 'Y-m-d H:i:s', time() );
-		AutoLoginKey::delete_expires( $now_date );
+		AutoLoginKey::delete_legacy_keys();
+		AutoLoginKey::delete_expired_keys();
 	}
 
 	/**
