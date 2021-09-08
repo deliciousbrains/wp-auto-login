@@ -3,6 +3,7 @@
 namespace DeliciousBrains\WPAutoLogin\CLI;
 
 use DeliciousBrains\WPAutoLogin\AutoLogin;
+use DeliciousBrains\WPAutoLogin\Model\AutoLoginKey;
 
 class Command extends \WP_CLI_Command {
 
@@ -22,7 +23,7 @@ class Command extends \WP_CLI_Command {
 	 *
 	 * @return null
 	 */
-	public function __invoke( $args, $assoc_args ) {
+	public function auto_login_url( $args, $assoc_args ) {
 		if ( empty( $args[0] ) ) {
 			return \WP_CLI::warning( 'User ID or email address not supplied' );
 		}
@@ -33,10 +34,29 @@ class Command extends \WP_CLI_Command {
 			return \WP_CLI::warning( 'User not found' );
 		}
 
-
 		$url = empty( $args[1] ) ? home_url() :  $args[1];
 		$key_url = AutoLogin::instance()->create_url( $url, $user->ID );
 
-		\WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
+		return \WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
+	}
+
+	/**
+	 * Purge expired auto-login keys from the database.
+	 *
+	 * @param array $args
+	 * @param array $assoc_args
+	 *
+	 * @return null
+	 */
+	public function purge_autologin_keys( $args, $assoc_args ) {
+		$legacy_keys_deleted  = AutoLoginKey::delete_legacy_keys();
+		$regular_keys_deleted = AutoLoginKey::delete_expired_keys();
+		$total_keys_deleted   = $legacy_keys_deleted + $regular_keys_deleted;
+
+		if ( false === $legacy_keys_deleted || false === $regular_keys_deleted ) {
+			return \WP_CLI::error( 'An error occurred while deleting expired keys. ' . $total_keys_deleted . ' keys were deleted.' );
+		}
+
+		return \WP_CLI::success( $total_keys_deleted . ' keys were deleted.' );
 	}
 }

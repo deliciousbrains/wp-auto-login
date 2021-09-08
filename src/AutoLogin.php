@@ -53,7 +53,7 @@ class AutoLogin {
 		Migrator::instance();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			\WP_CLI::add_command( $command_name . ' auto-login-url', Command::class );
+			\WP_CLI::add_command( $command_name, Command::class );
 		}
 
 		$this->expires = $expires;
