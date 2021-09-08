@@ -52,14 +52,37 @@ class AutoLogin {
 	public function init( $command_name, $expires ) {
 		Migrator::instance();
 
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			\WP_CLI::add_command( $command_name, Command::class );
-		}
+		$this->register_wpcli_commands( $command_name );
+
+		$this->register_cron_actions();
 
 		$this->expires = $expires;
 
 		add_filter( 'dbi_wp_migrations_paths', array( $this, 'add_migration_path' ) );
 		add_action( 'init', array( $this, 'handle_auto_login' ) );
+	}
+
+	/**
+	 * Registers WP-CLI commands
+	 *
+	 * @param string $command_name The name of the first-level command to register sub-commands under.
+	 *
+	 * @return void
+	 */
+	public function register_wpcli_commands( $command_name ) {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			\WP_CLI::add_command( $command_name, Command::class );
+		}
+	}
+
+	/**
+	 * Adds cron action hooks
+	 *
+	 * @return void
+	 */
+	public function register_cron_actions() {
+		// We'll make use of the built-in wp_scheduled_delete action.
+		add_action( 'wp_scheduled_delete', array( $this, 'remove_expired_keys' ) );
 	}
 
 	/**
