@@ -18,6 +18,12 @@ class Command extends \WP_CLI_Command {
 	 * [<url>]
 	 * : URL to add the login key to
 	 *
+	 * [--expiry=<seconds>]
+	 * : Number of seconds until key expires - defaults to 2 days
+	 * ---
+	 * default: 172800
+	 * ---
+	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 *
@@ -28,14 +34,20 @@ class Command extends \WP_CLI_Command {
 			return \WP_CLI::warning( 'User ID or email address not supplied' );
 		}
 
+		// Validate and fetch user
 		$field = is_numeric( $args[0] ) ? 'ID' : 'email';
 		$user  = get_user_by( $field, $args[0] );
 		if ( ! $user ) {
 			return \WP_CLI::warning( 'User not found' );
 		}
 
+		// Validate expiry
+		if ( ! is_numeric( $assoc_args['expiry'] ) ) {
+			\WP_CLI::error( 'Please specify a numeric value for the expiry.' );
+		}
+
 		$url = empty( $args[1] ) ? home_url() :  $args[1];
-		$key_url = AutoLogin::instance()->create_url( $url, $user->ID );
+		$key_url = AutoLogin::instance()->create_url( $url, $user->ID, array(), $assoc_args['expiry'] );
 
 		return \WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
 	}
