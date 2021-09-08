@@ -100,10 +100,12 @@ class AutoLoginKey {
 			return false;
 		}
 
-		// TODO: MAKE THIS WORK WITH NEW OBJECTS AND DATA
-		if ( mysql2date( 'G', $key->created ) < time() - $this->expires ) {
+		// Handle regular key
+		if ( mysql2date( 'G', $this->expires ) > time() ) {
 			return false;
 		}
+
+		return true;
 	}
 
 	public function is_legacy_key() {
