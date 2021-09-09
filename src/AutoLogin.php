@@ -192,7 +192,7 @@ class AutoLogin {
 	 *
 	 * @return void
 	 */
-	protected function remove_expired_keys() {
+	public function remove_expired_keys() {
 		AutoLoginKey::delete_legacy_keys();
 		AutoLoginKey::delete_expired_keys();
 	}
