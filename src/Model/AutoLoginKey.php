@@ -44,6 +44,11 @@ class AutoLoginKey {
 	 */
 	public $expires;
 
+	/**
+	 * Constructor
+	 *
+	 * @param array $attributes
+	 */
 	public function __construct( $attributes = array() ) {
 		foreach ( $attributes as $key => $value ) {
 			$this->$key = $value;
@@ -53,6 +58,12 @@ class AutoLoginKey {
 		}
 	}
 
+	/**
+	 * Fetches a key object for the specified key.
+	 *
+	 * @param string $key        The key to fetch a record for.
+	 * @return AutoLoginKey|null The key object to return, or null if not found.
+	 */
 	public static function get_by_key( $key ) {
 		global $wpdb;
 
@@ -106,6 +117,11 @@ class AutoLoginKey {
 		return $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE expires < %s AND expires != '0000-00-00 00:00:00'", $sql_now ) );
 	}
 
+	/**
+	 * Save the current object to the database
+	 *
+	 * @return int|bool
+	 */
 	public function save() {
 		global $wpdb;
 
@@ -119,6 +135,11 @@ class AutoLoginKey {
 		return $wpdb->insert( $wpdb->prefix . self::$table, $data );
 	}
 
+	/**
+	 * Checks if the current key is expired.
+	 *
+	 * @return boolean
+	 */
 	public function is_expired() {
 		// Handle legacy key for backwards compatibility.
 		if ( $this->is_legacy_key() ) {
@@ -133,10 +154,21 @@ class AutoLoginKey {
 		return true;
 	}
 
+	/**
+	 * Checks if the current key is a legacy key
+	 *
+	 * @return boolean
+	 */
 	public function is_legacy_key() {
 		return '0000-00-00 00:00:00' === $this->expires;
 	}
 
+	/**
+	 * Checks if the current key is expired based on the rules for legacy keys.
+	 * The rule is: was the key created more than LEGACY_EXPIRY_SECONDS ago?
+	 *
+	 * @return boolean
+	 */
 	public function has_legacy_key_expired() {
 		// The old version always used 4 months expiry.
 		return ( strtotime( $this->created ) + self::LEGACY_EXPIRY_SECONDS ) < time();
