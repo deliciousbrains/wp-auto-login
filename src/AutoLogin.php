@@ -107,7 +107,7 @@ class AutoLogin {
 		$login_key = filter_input( INPUT_GET, 'login_key', FILTER_SANITIZE_STRING );
 		$user_id   = filter_input( INPUT_GET, 'user_id', FILTER_VALIDATE_INT );
 
-		if ( empty( $login_key ) || empty( $user_id ) ) {
+		if ( $login_key === false || $login_key === null || $user_id === false || $user_id === null ) {
 			return;
 		}
 
@@ -116,15 +116,15 @@ class AutoLogin {
 			return;
 		}
 
-		$user = new \WP_User( $user_id );
+		$user = get_user_by( 'ID', $user_id );
 
-		if ( ! $user->ID ) {
+		if ( $user === false ) {
 			return;
 		}
 
 		$user_id = $this->get_user_id_for_key( $login_key );
 
-		if ( ! $user_id || $user_id != $user->ID ) {
+		if ( $user_id === false || $user_id != $user->ID ) {
 			do_action( 'wp_login_failed', $user->user_login );
 
 			return;
