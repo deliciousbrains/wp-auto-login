@@ -121,8 +121,8 @@ class AutoLoginKey {
 
 	public function is_expired() {
 		// Handle legacy key for backwards compatibility.
-		if ( $this->is_legacy_key() && $this->has_legacy_key_expired() ) {
-			return false;
+		if ( $this->is_legacy_key() ) {
+			return $this->has_legacy_key_expired();
 		}
 
 		// Handle regular key
