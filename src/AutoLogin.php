@@ -121,9 +121,9 @@ class AutoLogin {
 			return;
 		}
 
-		$user_id = $this->get_user_id_for_key( $login_key );
+		$user_id_for_key = $this->get_user_id_for_key( $login_key );
 
-		if ( $user_id === false || $user_id != $user->ID ) {
+		if ( $user_id_for_key === false || $user_id_for_key != $user->ID ) {
 			do_action( 'wp_login_failed', $user->user_login );
 
 			return;
