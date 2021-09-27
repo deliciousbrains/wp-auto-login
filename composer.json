@@ -19,5 +19,12 @@
   },
   "require": {
     "deliciousbrains/wp-migrations": "^2.0"
+  },
+  "require-dev": {
+	"humanmade/coding-standards": "^1.1"
+  },
+  "scripts": {
+	"phpcbf": "phpcbf --standard=phpcs.xml.dist",
+	"phpcs": "phpcs --standard=phpcs.xml.dist"
   }
 }

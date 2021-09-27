@@ -2,8 +2,8 @@
 
 namespace DeliciousBrains\WPAutoLogin;
 
-use DeliciousBrains\WPAutoLogin\Model\AutoLoginKey;
 use DeliciousBrains\WPAutoLogin\CLI\Command;
+use DeliciousBrains\WPAutoLogin\Model\AutoLoginKey;
 use DeliciousBrains\WPMigrations\Database\Migrator;
 
 /**
@@ -42,7 +42,6 @@ class AutoLogin {
 		return self::$instance;
 	}
 
-
 	/**
 	 * Initialise the singleton instance
 	 *
@@ -58,8 +57,8 @@ class AutoLogin {
 
 		$this->expires = $expires;
 
-		add_filter( 'dbi_wp_migrations_paths', array( $this, 'add_migration_path' ) );
-		add_action( 'init', array( $this, 'handle_auto_login' ) );
+		add_filter( 'dbi_wp_migrations_paths', [ $this, 'add_migration_path' ] );
+		add_action( 'init', [ $this, 'handle_auto_login' ] );
 	}
 
 	/**
@@ -82,7 +81,7 @@ class AutoLogin {
 	 */
 	public function register_cron_actions() {
 		// We'll make use of the built-in wp_scheduled_delete action.
-		add_action( 'wp_scheduled_delete', array( $this, 'remove_expired_keys' ) );
+		add_action( 'wp_scheduled_delete', [ $this, 'remove_expired_keys' ] );
 	}
 
 	/**
@@ -111,7 +110,7 @@ class AutoLogin {
 			return;
 		}
 
-		// Limit Login Attempts plugin
+		// Limit Login Attempts plugin.
 		if ( function_exists( 'is_limit_login_ok' ) && ! is_limit_login_ok() ) {
 			return;
 		}
@@ -133,7 +132,7 @@ class AutoLogin {
 		wp_set_auth_cookie( $user->ID );
 		do_action( 'wp_login', $user->user_login, $user );
 
-		$redirect = remove_query_arg( array( 'login_key', 'user_id' ) );
+		$redirect = remove_query_arg( [ 'login_key', 'user_id' ] );
 		wp_redirect( $redirect );
 		exit;
 	}
@@ -205,13 +204,13 @@ class AutoLogin {
 	 *
 	 * @return string
 	 */
-	public function create_url( $url, $user_id, $args = array(), $expires_in = null ) {
+	public function create_url( $url, $user_id, $args = [], $expires_in = null ) {
 		$login_key = $this->create_key( $user_id, $expires_in );
 
-		$args = array_merge( array(
+		$args = array_merge( [
 			'login_key' => $login_key,
 			'user_id'   => $user_id,
-		), $args );
+		], $args );
 
 		return add_query_arg( $args, $url );
 	}
