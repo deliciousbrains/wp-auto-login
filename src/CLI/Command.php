@@ -68,7 +68,6 @@ class Command extends \WP_CLI_Command {
 
 		if ( false === $legacy_keys_deleted || false === $regular_keys_deleted ) {
 			\WP_CLI::error( 'An error occurred while deleting expired keys. ' . $total_keys_deleted . ' keys were deleted.' );
-			return;
 		}
 
 		\WP_CLI::success( $total_keys_deleted . ' keys were deleted.' );
