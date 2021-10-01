@@ -24,21 +24,23 @@ class Command extends \WP_CLI_Command {
 	 * default: 172800
 	 * ---
 	 *
-	 * @param array $args
-	 * @param array $assoc_args
+	 * @param array<mixed> $args
+	 * @param array<string, mixed> $assoc_args
 	 *
-	 * @return null
+	 * @return void
 	 */
 	public function auto_login_url( $args, $assoc_args ) {
 		if ( empty( $args[0] ) ) {
-			return \WP_CLI::warning( 'User ID or email address not supplied' );
+			\WP_CLI::warning( 'User ID or email address not supplied' );
+			return;
 		}
 
 		// Validate and fetch user
 		$field = is_numeric( $args[0] ) ? 'ID' : 'email';
 		$user  = get_user_by( $field, $args[0] );
 		if ( ! $user ) {
-			return \WP_CLI::warning( 'User not found' );
+			\WP_CLI::warning( 'User not found' );
+			return;
 		}
 
 		// Validate expiry
@@ -49,16 +51,15 @@ class Command extends \WP_CLI_Command {
 		$url = empty( $args[1] ) ? home_url() :  $args[1];
 		$key_url = AutoLogin::instance()->create_url( $url, $user->ID, array(), $assoc_args['expiry'] );
 
-		return \WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
+		\WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
 	}
 
 	/**
 	 * Purge expired auto-login keys from the database.
 	 *
-	 * @param array $args
-	 * @param array $assoc_args
-	 *
-	 * @return null
+	 * @param array<mixed> $args
+	 * @param array<string, mixed> $assoc_args
+	 * @return void
 	 */
 	public function purge_autologin_keys( $args, $assoc_args ) {
 		$legacy_keys_deleted  = AutoLoginKey::delete_legacy_keys();
@@ -66,9 +67,9 @@ class Command extends \WP_CLI_Command {
 		$total_keys_deleted   = $legacy_keys_deleted + $regular_keys_deleted;
 
 		if ( false === $legacy_keys_deleted || false === $regular_keys_deleted ) {
-			return \WP_CLI::error( 'An error occurred while deleting expired keys. ' . $total_keys_deleted . ' keys were deleted.' );
+			\WP_CLI::error( 'An error occurred while deleting expired keys. ' . $total_keys_deleted . ' keys were deleted.' );
 		}
 
-		return \WP_CLI::success( $total_keys_deleted . ' keys were deleted.' );
+		\WP_CLI::success( $total_keys_deleted . ' keys were deleted.' );
 	}
 }

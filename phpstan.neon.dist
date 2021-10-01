@@ -1,0 +1,12 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+    level: max
+    inferPrivatePropertyTypeFromConstructor: true
+    scanFiles:
+        - tests/bootstrap.php
+    paths:
+        - functions.php
+        - src/
+    ignoreErrors:
+        - '#^Parameter \#2 \$callable of static method WP_CLI::add_command\(\) expects callable\(\):#'
