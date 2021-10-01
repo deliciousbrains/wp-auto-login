@@ -34,7 +34,7 @@ class AutoLogin {
 	 * @return AutoLogin Instance
 	 */
 	public static function instance( $command_name = 'dbi', $expires = 10_368_000 ) {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
+		if ( ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
 			self::$instance->init( $command_name, $expires );
 		}
@@ -47,6 +47,8 @@ class AutoLogin {
 	 *
 	 * @param string $command_name  Name to used for WP-CLI command.
 	 * @param int    $expires       Key expiry in seconds.
+	 *
+	 * @return void
 	 */
 	public function init( $command_name, $expires ) {
 		Migrator::instance();
@@ -197,10 +199,10 @@ class AutoLogin {
 	}
 
 	/**
-	 * @param string   $url
-	 * @param int      $user_id
-	 * @param array    $args
-	 * @param null|int $expires_in Seconds
+	 * @param string       $url
+	 * @param int          $user_id
+	 * @param array<mixed> $args
+	 * @param null|int     $expires_in Seconds
 	 *
 	 * @return string
 	 */

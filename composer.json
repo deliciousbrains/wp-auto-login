@@ -18,13 +18,15 @@
     ]
   },
   "require": {
+    "php": "^5.3 || ^7.0",
     "deliciousbrains/wp-migrations": "^2.0"
   },
   "require-dev": {
-	"humanmade/coding-standards": "^1.1"
+    "humanmade/coding-standards": "^1.1",
+    "szepeviktor/phpstan-wordpress": "^0.7.7"
   },
   "scripts": {
-	"phpcbf": "phpcbf --standard=phpcs.xml.dist",
-	"phpcs": "phpcs --standard=phpcs.xml.dist"
+    "phpcbf": "phpcbf --standard=phpcs.xml.dist",
+    "phpcs": "phpcs --standard=phpcs.xml.dist"
   }
 }
