@@ -45,7 +45,7 @@ You can also specify your own global default for expiry when bootstrapping the p
 
 There is also an option to generate links that can only be used once:
 
-`dbi_get_auto_login_url( $destination_url, $user_id, $query_parms, null, true );`
+`dbi_get_auto_login_url( $destination_url, $user_id, $query_params, null, true );`
 
 ## WP-CLI
 
