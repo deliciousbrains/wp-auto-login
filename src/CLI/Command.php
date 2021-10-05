@@ -23,6 +23,9 @@ class Command extends \WP_CLI_Command {
 	 * ---
 	 * default: 172800
 	 * ---
+
+	 * [--one-time]
+	 * : Make the login key work only once
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -47,7 +50,7 @@ class Command extends \WP_CLI_Command {
 		}
 
 		$url = empty( $args[1] ) ? home_url() :  $args[1];
-		$key_url = AutoLogin::instance()->create_url( $url, $user->ID, array(), $assoc_args['expiry'] );
+		$key_url = AutoLogin::instance()->create_url( $url, $user->ID, array(), $assoc_args['expiry'], $assoc_args['one-time'] );
 
 		return \WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
 	}
