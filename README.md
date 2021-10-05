@@ -10,6 +10,8 @@ It needs to be running PHP 5.3 or higher.
 
 It requires the [deliciousbrains/wp-migration](https://github.com/deliciousbrains/wp-migrations) package and so the site will need to be set up to run `wp dbi migrate` as a last stage build step in your deployment process.
 
+You should also run `wp dbi migrate` after updating the package to make sure you have up to date database tables.
+
 It automatically purges expired keys from the database daily, and there are WP-CLI commands to:
 
 1. Manually purge expired keys
@@ -31,15 +33,19 @@ There are two parameters you can pass when bootstrapping the package:
 
 To generate a URL that will automatically login a user and land them at a specific URL use this function:
 
-`dbi_get_auto_login_url( $destination_url, $user_id, $query_parms );`
+`dbi_get_auto_login_url( $destination_url, $user_id, [$query_params], [$expiry], [$one_time] );`
 
 The URL will expire in 120 days. However, you can pass the number of seconds the URL will be valid for as the fourth argument, e.g valid for 1 day:
 
-`dbi_get_auto_login_url( $destination_url, $user_id, $query_parms, 86400 );`
+`dbi_get_auto_login_url( $destination_url, $user_id, $query_params, 86400 );`
 
 You can also specify your own global default for expiry when bootstrapping the package as explained in the "Installation" section above. Use:
 
 `\DeliciousBrains\WPAutoLogin\AutoLogin::instance( 'dbi', <expiry_in_seconds> );`
+
+There is also an option to generate links that can only be used once:
+
+`dbi_get_auto_login_url( $destination_url, $user_id, $query_parms, null, true );`
 
 ## WP-CLI
 
@@ -74,3 +80,7 @@ Example:
 `wp dbi auto_login_url 12345 https://example.com/dashboard --expiry=21600`
 
 Will generate a link that logs in the user with ID 12345 and takes them to https://example.com/dashboard. The link will be valid for 6 hours.
+
+You can add `--one-time` to generate a single-use link:
+
+`wp dbi auto_login_url 12345 https://example.com/dashboard --one-time`
