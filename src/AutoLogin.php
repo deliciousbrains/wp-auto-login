@@ -33,7 +33,7 @@ class AutoLogin {
 	 *
 	 * @return AutoLogin Instance
 	 */
-	public static function instance( $command_name = 'dbi', $expires = 10_368_000 ) {
+	public static function instance( $command_name = 'dbi', $expires = 10368000 ) {
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
 			self::$instance->init( $command_name, $expires );
