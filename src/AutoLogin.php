@@ -121,7 +121,9 @@ class AutoLogin {
 			return;
 		}
 
-		$user_id_for_key = $this->get_user_id_for_key( $login_key );
+		$key = AutoLoginKey::get_by_key( $login_key );
+
+		$user_id_for_key = $this->get_user_id_for_key( $key );
 
 		if ( $user_id_for_key === false || $user_id_for_key != $user->ID ) {
 			do_action( 'wp_login_failed', $user->user_login );
@@ -131,6 +133,8 @@ class AutoLogin {
 
 		wp_set_auth_cookie( $user->ID );
 		do_action( 'wp_login', $user->user_login, $user );
+
+		$key->maybe_delete_one_time_key();
 
 		$redirect = remove_query_arg( [ 'login_key', 'user_id' ] );
 		wp_redirect( $redirect );
@@ -142,9 +146,7 @@ class AutoLogin {
 	 *
 	 * @return bool|int
 	 */
-	public function get_user_id_for_key( $key_to_find ) {
-		$key = AutoLoginKey::get_by_key( $key_to_find );
-
+	public function get_user_id_for_key( $key ) {
 		if ( ! $key ) {
 			return false;
 		}

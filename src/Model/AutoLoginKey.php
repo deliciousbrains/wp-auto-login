@@ -66,6 +66,8 @@ class AutoLoginKey {
 
 		if ( ! isset( $attributes['one_time'] ) ) {
 			$this->one_time = false;
+		} else {
+			$this->one_time = (bool) $attributes['one_time'];
 		}
 	}
 
@@ -91,29 +93,24 @@ class AutoLoginKey {
 			return null;
 		}
 
-		if ( (bool) $row['one_time'] ) {
-			self::maybe_delete_one_time_key( $key );
-		}
-
 		return new self( $row );
 	}
 
 	/**
-	 * Static method to check if a key is one-time and to delete it from the
-	 * database if it is.
+	 * Check if the key is one-time and to delete it from the database if it is.
 	 *
-	 * @param string $key
+	 * @param AutoLoginKey $key
 	 *
 	 * @return int|bool  The number of rows deleted, or false if an error occurred.
 	 *                   Note that both false and 0 can be returned so be careful with
 	 *                   comparisons.
 	 */
-	public static function maybe_delete_one_time_key( $key ) {
+	public function maybe_delete_one_time_key() {
 		global $wpdb;
 
 		$table = self::$table;
 
-		return $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE login_key = %s AND one_time = 1", $key ) );
+		return $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE login_key = %s AND one_time = 1", $this->login_key ) );
 	}
 
 	/**
