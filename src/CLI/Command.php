@@ -44,13 +44,15 @@ class Command extends \WP_CLI_Command {
 			return \WP_CLI::warning( 'User not found' );
 		}
 
-		// Validate expiry
+		// Validate one-time option.
+		$one_time = isset( $assoc_args['one-time'] ) ? (bool) $assoc_args['one-time'] : false;
+
 		if ( ! is_numeric( $assoc_args['expiry'] ) ) {
 			\WP_CLI::error( 'Please specify a numeric value for the expiry.' );
 		}
 
-		$url = empty( $args[1] ) ? home_url() :  $args[1];
-		$key_url = AutoLogin::instance()->create_url( $url, $user->ID, array(), $assoc_args['expiry'], $assoc_args['one-time'] );
+		$url = empty( $args[1] ) ? home_url() : $args[1];
+		$key_url = AutoLogin::instance()->create_url( $url, $user->ID, array(), $assoc_args['expiry'], $one_time );
 
 		return \WP_CLI::success( 'Auto-login URL generated: ' . $key_url );
 	}
