@@ -47,6 +47,7 @@ class Command extends \WP_CLI_Command {
 		// Validate one-time option.
 		$one_time = isset( $assoc_args['one-time'] ) ? (bool) $assoc_args['one-time'] : false;
 
+		// Validate expiry. Note that WP-CLI always provides a default so we don't need an isset check.
 		if ( ! is_numeric( $assoc_args['expiry'] ) ) {
 			\WP_CLI::error( 'Please specify a numeric value for the expiry.' );
 		}
