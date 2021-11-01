@@ -34,7 +34,7 @@ class AutoLogin {
 	 * @return AutoLogin Instance
 	 */
 	public static function instance( $command_name = 'dbi', $expires = 10368000 ) {
-		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof AutoLogin ) ) {
+		if ( ! isset( self::$instance ) || ! ( self::$instance instanceof AutoLogin ) ) {
 			self::$instance = new AutoLogin();
 			self::$instance->init( $command_name, $expires );
 		}
@@ -121,7 +121,9 @@ class AutoLogin {
 			return;
 		}
 
-		$user_id_for_key = $this->get_user_id_for_key( $login_key );
+		$key = AutoLoginKey::get_by_key( $login_key );
+
+		$user_id_for_key = $this->get_user_id_for_key( $key );
 
 		if ( $user_id_for_key === false || $user_id_for_key != $user->ID ) {
 			do_action( 'wp_login_failed', $user->user_login );
@@ -131,6 +133,8 @@ class AutoLogin {
 
 		wp_set_auth_cookie( $user->ID );
 		do_action( 'wp_login', $user->user_login, $user );
+
+		$key->maybe_delete_one_time_key();
 
 		$redirect = remove_query_arg( [ 'login_key', 'user_id' ] );
 		wp_redirect( $redirect );
@@ -142,9 +146,7 @@ class AutoLogin {
 	 *
 	 * @return bool|int
 	 */
-	public function get_user_id_for_key( $key_to_find ) {
-		$key = AutoLoginKey::get_by_key( $key_to_find );
-
+	public function get_user_id_for_key( $key ) {
 		if ( ! $key ) {
 			return false;
 		}
@@ -157,12 +159,13 @@ class AutoLogin {
 	}
 
 	/**
-	 * @param int      $user_id
-	 * @param null|int $expires_in Seconds
+	 * @param int          $user_id
+	 * @param null|int     $expires_in Seconds
+	 * @param null|boolean $one_time
 	 *
 	 * @return bool|string
 	 */
-	public function create_key( $user_id, $expires_in = null ) {
+	public function create_key( $user_id, $expires_in = null, $one_time = false ) {
 		do {
 			$key            = wp_generate_password( 40, false );
 			$already_exists = AutoLoginKey::get_by_key( $key );
@@ -171,6 +174,7 @@ class AutoLogin {
 		$loginkey            = new AutoLoginKey();
 		$loginkey->login_key = $key;
 		$loginkey->user_id   = $user_id;
+		$loginkey->one_time  = $one_time;
 		if ( $expires_in ) {
 			$loginkey->expires = gmdate( 'Y-m-d H:i:s', time() + $expires_in );
 		} else {
@@ -197,15 +201,16 @@ class AutoLogin {
 	}
 
 	/**
-	 * @param string   $url
-	 * @param int      $user_id
-	 * @param array    $args
-	 * @param null|int $expires_in Seconds
+	 * @param string       $url
+	 * @param int          $user_id
+	 * @param array        $args
+	 * @param null|int     $expires_in Seconds
+	 * @param null|boolean $one_time
 	 *
 	 * @return string
 	 */
-	public function create_url( $url, $user_id, $args = [], $expires_in = null ) {
-		$login_key = $this->create_key( $user_id, $expires_in );
+	public function create_url( $url, $user_id, $args = [], $expires_in = null, $one_time = false ) {
+		$login_key = $this->create_key( $user_id, $expires_in, $one_time );
 
 		$args = array_merge( [
 			'login_key' => $login_key,

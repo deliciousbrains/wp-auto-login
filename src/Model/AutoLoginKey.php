@@ -45,6 +45,13 @@ class AutoLoginKey {
 	public $expires;
 
 	/**
+	 * Flag to indicate that key can only be used once
+	 *
+	 * @var boolean
+	 */
+	public $one_time;
+
+	/**
 	 * Constructor
 	 *
 	 * @param array $attributes
@@ -56,10 +63,18 @@ class AutoLoginKey {
 		if ( ! isset( $attributes['created'] ) ) {
 			$this->created = gmdate( 'Y-m-d H:i:s', time() );
 		}
+
+		if ( ! isset( $attributes['one_time'] ) ) {
+			$this->one_time = false;
+		} else {
+			$this->one_time = (bool) $attributes['one_time'];
+		}
 	}
 
 	/**
 	 * Fetches a key object for the specified key.
+	 *
+	 * If the key is one-time then it will be deleted here too.
 	 *
 	 * @param string $key        The key to fetch a record for.
 	 * @return AutoLoginKey|null The key object to return, or null if not found.
@@ -79,6 +94,21 @@ class AutoLoginKey {
 		}
 
 		return new self( $row );
+	}
+
+	/**
+	 * Check if the key is one-time and to delete it from the database if it is.
+	 *
+	 * @return int|bool  The number of rows deleted, or false if an error occurred.
+	 *                   Note that both false and 0 can be returned so be careful with
+	 *                   comparisons.
+	 */
+	public function maybe_delete_one_time_key() {
+		global $wpdb;
+
+		$table = self::$table;
+
+		return $wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->prefix{$table} WHERE login_key = %s AND one_time = 1", $this->login_key ) );
 	}
 
 	/**
@@ -130,6 +160,7 @@ class AutoLoginKey {
 			'user_id'   => $this->user_id,
 			'expires'   => $this->expires,
 			'created'   => $this->created,
+			'one_time'  => (int) $this->one_time,
 		);
 
 		return $wpdb->insert( $wpdb->prefix . self::$table, $data );
