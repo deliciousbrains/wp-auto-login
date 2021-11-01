@@ -99,8 +99,6 @@ class AutoLoginKey {
 	/**
 	 * Check if the key is one-time and to delete it from the database if it is.
 	 *
-	 * @param AutoLoginKey $key
-	 *
 	 * @return int|bool  The number of rows deleted, or false if an error occurred.
 	 *                   Note that both false and 0 can be returned so be careful with
 	 *                   comparisons.
