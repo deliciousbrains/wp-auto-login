@@ -110,9 +110,7 @@ class AutoLogin {
 			return;
 		}
 
-		if ( $login_key !== null && $login_key !== false ) {
-			$login_key = sanitize_text_field( $login_key );
-		}
+		$login_key = sanitize_text_field( $login_key );
 
 		// Limit Login Attempts plugin.
 		if ( function_exists( 'is_limit_login_ok' ) && ! is_limit_login_ok() ) {
