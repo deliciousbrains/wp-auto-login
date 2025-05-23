@@ -104,13 +104,14 @@ class AutoLogin {
 	 */
 	public function handle_auto_login() {
 		$login_key = filter_input( INPUT_GET, 'login_key', FILTER_DEFAULT );
-		if ( $login_key !== null && $login_key !== false ) {
-			$login_key = sanitize_text_field( $login_key );
-		}
 		$user_id   = filter_input( INPUT_GET, 'user_id', FILTER_VALIDATE_INT );
 
 		if ( $login_key === false || $login_key === null || $user_id === false || $user_id === null ) {
 			return;
+		}
+
+		if ( $login_key !== null && $login_key !== false ) {
+			$login_key = sanitize_text_field( $login_key );
 		}
 
 		// Limit Login Attempts plugin.
