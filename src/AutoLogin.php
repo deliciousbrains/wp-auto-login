@@ -103,12 +103,14 @@ class AutoLogin {
 	 * @return void
 	 */
 	public function handle_auto_login() {
-		$login_key = filter_input( INPUT_GET, 'login_key', FILTER_SANITIZE_STRING );
+		$login_key = filter_input( INPUT_GET, 'login_key', FILTER_DEFAULT );
 		$user_id   = filter_input( INPUT_GET, 'user_id', FILTER_VALIDATE_INT );
 
 		if ( $login_key === false || $login_key === null || $user_id === false || $user_id === null ) {
 			return;
 		}
+
+		$login_key = sanitize_text_field( $login_key );
 
 		// Limit Login Attempts plugin.
 		if ( function_exists( 'is_limit_login_ok' ) && ! is_limit_login_ok() ) {
